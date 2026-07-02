@@ -306,6 +306,7 @@ public partial class MainWindow : Window
             BackToMenu();
             return;
         }
+        _softDropping = false;
         _engine.StartNewGame(_engine.Mode);
         UpdateTimerInterval();
         _gameTimer.Start();
@@ -347,6 +348,7 @@ public partial class MainWindow : Window
         _gameTimer.Stop();
         _autoRepeatLeft.Stop();
         _autoRepeatRight.Stop();
+        _softDropping = false;
         GamePanel.Visibility = Visibility.Collapsed;
         OverlayPanel.Visibility = Visibility.Collapsed;
         ModeSelectionPanel.Visibility = Visibility.Visible;
