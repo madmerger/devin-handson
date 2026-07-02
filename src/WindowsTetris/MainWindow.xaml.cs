@@ -19,6 +19,7 @@ public partial class MainWindow : Window
     private readonly DispatcherTimer _autoRepeatRight = new();
 
     private bool _softDropping;
+    private CancellationTokenSource? _stageClearCts;
 
     private static readonly Dictionary<CellType, Color> CellColors = new()
     {
@@ -280,16 +281,27 @@ public partial class MainWindow : Window
             return;
         }
 
-        OverlayPanel.Visibility = Visibility.Visible;
-        OverlayButton.Visibility = Visibility.Collapsed;
-        OverlayText.Text = "STAGE CLEAR!";
-        await Task.Delay(500);
-        OverlayText.Text = "3";
-        await Task.Delay(500);
-        OverlayText.Text = "2";
-        await Task.Delay(500);
-        OverlayText.Text = "1";
-        await Task.Delay(500);
+        _stageClearCts?.Cancel();
+        _stageClearCts = new CancellationTokenSource();
+        var token = _stageClearCts.Token;
+
+        try
+        {
+            OverlayPanel.Visibility = Visibility.Visible;
+            OverlayButton.Visibility = Visibility.Collapsed;
+            OverlayText.Text = "STAGE CLEAR!";
+            await Task.Delay(500, token);
+            OverlayText.Text = "3";
+            await Task.Delay(500, token);
+            OverlayText.Text = "2";
+            await Task.Delay(500, token);
+            OverlayText.Text = "1";
+            await Task.Delay(500, token);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
 
         OverlayPanel.Visibility = Visibility.Collapsed;
         _engine.AdvanceStage();
@@ -349,6 +361,7 @@ public partial class MainWindow : Window
         _autoRepeatLeft.Stop();
         _autoRepeatRight.Stop();
         _softDropping = false;
+        _stageClearCts?.Cancel();
         GamePanel.Visibility = Visibility.Collapsed;
         OverlayPanel.Visibility = Visibility.Collapsed;
         ModeSelectionPanel.Visibility = Visibility.Visible;
