@@ -46,7 +46,6 @@ public partial class MainWindow : Window
         _autoRepeatRight.Interval = TimeSpan.FromMilliseconds(80);
         _autoRepeatRight.Tick += (_, _) => { _engine.MoveRight(); Render(); };
 
-        _engine.BoardChanged += () => Dispatcher.Invoke(Render);
         _engine.GameOverEvent += () => Dispatcher.Invoke(ShowGameOver);
         _engine.GameClearEvent += () => Dispatcher.Invoke(ShowGameClear);
     }
@@ -252,7 +251,7 @@ public partial class MainWindow : Window
         StageText.Text = (_engine.CurrentStage + 1).ToString();
 
         var ts = TimeSpan.FromSeconds(_engine.PlayTimeSeconds);
-        TimeText.Text = $"{ts.Minutes:D2}:{ts.Seconds:D2}:{(ts.Milliseconds / 10):D2}";
+        TimeText.Text = $"{(int)ts.TotalMinutes:D2}:{ts.Seconds:D2}:{(ts.Milliseconds / 10):D2}";
     }
 
     private void ShowGameOver()
